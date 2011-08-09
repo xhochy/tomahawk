@@ -91,10 +91,12 @@ DatabaseCollection::loadTracks()
 void
 DatabaseCollection::loadArtists()
 {
+    tDebug() << Q_FUNC_INFO;
+
     DatabaseCommand_AllArtists* cmd = new DatabaseCommand_AllArtists( source()->collection() );
 
     connect( cmd, SIGNAL( artists( QList<Tomahawk::artist_ptr> ) ),
-                SIGNAL(artistsLoaded(QList<Tomahawk::artist_ptr>) ) );
+                SIGNAL( artistsLoaded( QList<Tomahawk::artist_ptr> ) ) );
 
     Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
 }

@@ -441,6 +441,8 @@ TreeModel::addCollection( const collection_ptr& collection )
     connect( collection.data(), SIGNAL( artistsLoaded( QList<Tomahawk::artist_ptr> ) ),
                                  this, SLOT( onArtistsAdded( QList<Tomahawk::artist_ptr> ) ) );
 
+    collection->loadArtists();
+
     if ( collection->source()->isLocal() )
         setTitle( tr( "Your Collection" ) );
     else
@@ -476,6 +478,8 @@ TreeModel::addFilteredCollection( const collection_ptr& collection, unsigned int
 void
 TreeModel::onArtistsAdded( const QList<Tomahawk::artist_ptr>& artists )
 {
+    tDebug() << Q_FUNC_INFO;
+
     if ( !artists.count() )
         return;
 
