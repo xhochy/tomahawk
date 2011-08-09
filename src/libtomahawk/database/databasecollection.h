@@ -38,6 +38,9 @@ public:
         qDebug() << Q_FUNC_INFO;
     }
 
+    virtual void loadArtists();
+
+
     virtual void loadTracks();
     virtual void loadPlaylists();
     virtual void loadAutoPlaylists();

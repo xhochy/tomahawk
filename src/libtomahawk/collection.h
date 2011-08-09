@@ -54,6 +54,10 @@ public:
     virtual bool isLoaded() const { return m_isLoaded; }
     virtual QString name() const;
 
+    virtual void loadArtists() { tLog() << Q_FUNC_INFO; }
+    virtual void loadAlbums( const Tomahawk::artist_ptr& artist );
+    virtual void loadTracks( const Tomahawk::album_ptr& album );
+
     virtual void loadPlaylists() { qDebug() << Q_FUNC_INFO; }
     virtual void loadTracks() { qDebug() << Q_FUNC_INFO; }
     virtual void loadAutoPlaylists() { qDebug() << Q_FUNC_INFO ; }
@@ -81,6 +85,10 @@ public:
     unsigned int lastmodified() const { return m_lastmodified; }
 
 signals:
+    void artistsLoaded( const QList<Tomahawk::artist_ptr>& artists );
+    void albumsLoaded( const QList<Tomahawk::album_ptr>& albums );
+    void tracksLoaded( const QList<Tomahawk::result_ptr>& tracks );
+
     void tracksAdded( const QList<Tomahawk::query_ptr>& tracks );
     void tracksRemoved( const QList<Tomahawk::query_ptr>& tracks );
 

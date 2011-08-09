@@ -24,6 +24,10 @@
 #include "dynamic/DynamicPlaylist.h"
 #include "playlist.h"
 
+#include "artist.h"
+#include "album.h"
+#include "track.h"
+
 #include "utils/logger.h"
 
 using namespace Tomahawk;
@@ -272,3 +276,19 @@ Collection::moveStationToAuto( const QString& guid )
     if( m_stations.contains( guid ) )
         m_autoplaylists.insert( guid, m_stations.take( guid ) );
 }
+
+
+void
+Collection::loadAlbums(const artist_ptr& artist)
+{
+    tLog() << Q_FUNC_INFO << artist->name();
+}
+
+
+void
+Collection::loadTracks(const album_ptr& album)
+{
+    tLog() << Q_FUNC_INFO << album->artist()->name();
+}
+
+

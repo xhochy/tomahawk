@@ -437,12 +437,9 @@ TreeModel::addCollection( const collection_ptr& collection )
                             << collection->source()->userName();
 
     m_collection = collection;
-    DatabaseCommand_AllArtists* cmd = new DatabaseCommand_AllArtists( collection );
 
-    connect( cmd, SIGNAL( artists( QList<Tomahawk::artist_ptr> ) ),
-                    SLOT( onArtistsAdded( QList<Tomahawk::artist_ptr> ) ) );
-
-    Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
+    connect( collection.data(), SIGNAL( artistsLoaded( QList<Tomahawk::artist_ptr> ) ),
+                                 this, SLOT( onArtistsAdded( QList<Tomahawk::artist_ptr> ) ) );
 
     if ( collection->source()->isLocal() )
         setTitle( tr( "Your Collection" ) );

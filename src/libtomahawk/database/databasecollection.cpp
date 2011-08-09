@@ -25,6 +25,7 @@
 #include "databasecommand_loadallplaylists.h"
 #include "databasecommand_loadallautoplaylists.h"
 #include "databasecommand_loadallstations.h"
+#include "databasecommand_allartists.h"
 
 #include "utils/logger.h"
 
@@ -85,6 +86,19 @@ DatabaseCollection::loadTracks()
 
     Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
 }
+
+
+void
+DatabaseCollection::loadArtists()
+{
+    DatabaseCommand_AllArtists* cmd = new DatabaseCommand_AllArtists( source()->collection() );
+
+    connect( cmd, SIGNAL( artists( QList<Tomahawk::artist_ptr> ) ),
+                SIGNAL(artistsLoaded(QList<Tomahawk::artist_ptr>) ) );
+
+    Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
+}
+
 
 
 void
