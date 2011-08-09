@@ -39,7 +39,8 @@ public:
     }
 
     virtual void loadArtists();
-
+    virtual void loadAlbums( const Tomahawk::artist_ptr& artist );
+    virtual void loadTracks( const Tomahawk::album_ptr& album );
 
     virtual void loadTracks();
     virtual void loadPlaylists();

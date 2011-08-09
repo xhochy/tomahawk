@@ -60,7 +60,7 @@ public:
     void setSortDescending( bool descending ) { m_sortDescending = descending; }
 
 signals:
-    void albums( const QList<Tomahawk::album_ptr>&, const QVariant& data );
+    void albums( const QList<Tomahawk::album_ptr>&, const Tomahawk::artist_ptr& artist );
     void done();
 
 private:

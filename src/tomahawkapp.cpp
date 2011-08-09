@@ -327,6 +327,8 @@ TomahawkApp::registerMetaTypes()
     qRegisterMetaType<Tomahawk::GeneratorMode>("Tomahawk::GeneratorMode");
 
     // Extra definition for namespaced-versions of signals/slots required
+    qRegisterMetaType< Tomahawk::artist_ptr >("Tomahawk::artist_ptr");
+    qRegisterMetaType< Tomahawk::album_ptr >("Tomahawk::album_ptr");
     qRegisterMetaType< Tomahawk::source_ptr >("Tomahawk::source_ptr");
     qRegisterMetaType< Tomahawk::collection_ptr >("Tomahawk::collection_ptr");
     qRegisterMetaType< Tomahawk::result_ptr >("Tomahawk::result_ptr");

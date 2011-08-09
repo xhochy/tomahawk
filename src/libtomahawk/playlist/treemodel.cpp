@@ -397,13 +397,14 @@ TreeModel::addAlbums( const artist_ptr& artist, const QModelIndex& parent )
     qDebug() << Q_FUNC_INFO;
 
     emit loadingStarted();
-    DatabaseCommand_AllAlbums* cmd = new DatabaseCommand_AllAlbums( m_collection, artist );
-    cmd->setData( parent.row() );
 
-    connect( cmd, SIGNAL( albums( QList<Tomahawk::album_ptr>, QVariant ) ),
-                    SLOT( onAlbumsAdded( QList<Tomahawk::album_ptr>, QVariant ) ) );
+    connect( m_collection.data(), SIGNAL( albumsLoaded( QList<Tomahawk::album_ptr>, Tomahawk::artist_ptr ) ),
+             SLOT( onAlbumsAdded( QList<Tomahawk::album_ptr>, Tomahawk::artist_ptr ) ) );
 
-    Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
+    // cache the current position
+    m_artistIndices.insert( artist, parent );
+
+    m_collection->loadAlbums( artist );
 }
 
 
@@ -505,13 +506,16 @@ TreeModel::onArtistsAdded( const QList<Tomahawk::artist_ptr>& artists )
 
 
 void
-TreeModel::onAlbumsAdded( const QList<Tomahawk::album_ptr>& albums, const QVariant& data )
+TreeModel::onAlbumsAdded( const QList<Tomahawk::album_ptr>& albums, const Tomahawk::artist_ptr& artist )
 {
-    qDebug() << Q_FUNC_INFO << albums.count() << data.toInt();
+    int row = m_artistIndices.value( artist ).row();
+    m_artistIndices.remove( artist );
+
+    tDebug() << Q_FUNC_INFO << albums.count() << row;
     if ( !albums.count() )
         return;
 
-    QModelIndex parent = index( data.toInt(), 0, QModelIndex() );
+    QModelIndex parent = index( row, 0, QModelIndex() );
     TreeModelItem* parentItem = itemFromIndex( parent );
 
     QPair< int, int > crows;
