@@ -445,13 +445,13 @@ CollectionItem::getLovedTracksPage() const
 ViewPage*
 CollectionItem::dommeClicked()
 {
-    ViewManager::instance()->setTreeMode();
     if ( !m_dommePage )
     {
         m_domme = collection_ptr( new DummyCollection( SourceList::instance()->getLocal() ) );
     }
 
     m_dommePage = ViewManager::instance()->show( m_domme );
+    ViewManager::instance()->setTreeMode();
     return m_dommePage;
 }
 
