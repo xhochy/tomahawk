@@ -42,34 +42,12 @@ public:
         qDebug() << Q_FUNC_INFO;
     }
 
-    virtual void loadArtists()
-    {
-        QList< Tomahawk::artist_ptr > artists;
+    virtual void loadArtists();
+    virtual void loadAlbums( const Tomahawk::artist_ptr& artist );
+    virtual void loadTracks( const Tomahawk::album_ptr& album );
 
-        artists
-            << Tomahawk::Artist::get("Iron Maiden")
-            << Tomahawk::Artist::get("Saxon")
-            << Tomahawk::Artist::get("Knorkator");
-
-        emit artistsLoaded( artists );
-    }
-
-    virtual void loadAlbums( const Tomahawk::artist_ptr& artist )
-    {
-        QList< Tomahawk::album_ptr > albums;
-
-        emit albumsLoaded( albums, artist );
-    }
-
-    virtual void loadTracks( const Tomahawk::album_ptr& album )
-    {
-        QList< Tomahawk::result_ptr > tracks;
-
-        emit tracksLoaded( tracks, album );
-    }
-
-  virtual void addTracks ( const QList< QVariant >& newitems ) {}
-  virtual void removeTracks ( const QDir& dir ) {}
+    virtual void addTracks ( const QList< QVariant >& newitems ) {}
+    virtual void removeTracks ( const QDir& dir ) {}
 };
 
 #endif // DUMMYCOLLECTION_H
