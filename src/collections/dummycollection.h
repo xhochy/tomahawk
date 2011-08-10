@@ -23,11 +23,13 @@
 #include "typedefs.h"
 
 #include "artist.h"
+#include "album.h"
+#include "track.h"
+
 
 #include <QDir>
 
 #include "dllmacro.h"
-#include <album.h>
 
 class DLLEXPORT DummyCollection : public Tomahawk::Collection
 {
@@ -42,7 +44,7 @@ public:
 
     virtual void loadArtists()
     {
-        QList< Tomhawk::artist_ptr > artists;
+        QList< Tomahawk::artist_ptr > artists;
 
         artists
             << Tomahawk::Artist::get("Iron Maiden")
@@ -54,14 +56,14 @@ public:
 
     virtual void loadAlbums( const Tomahawk::artist_ptr& artist )
     {
-        QList< Tomhawk::album_ptr > albums;
+        QList< Tomahawk::album_ptr > albums;
 
         emit albumsLoaded( albums, artist );
     }
 
     virtual void loadTracks( const Tomahawk::album_ptr& album )
     {
-        QList< Tomhawk::result_ptr > tracks;
+        QList< Tomahawk::result_ptr > tracks;
 
         emit tracksLoaded( tracks, album );
     }
