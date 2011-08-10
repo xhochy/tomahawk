@@ -40,6 +40,8 @@ SET( tomahawkSources ${tomahawkSources}
      resolvers/scriptresolver.cpp
      resolvers/qtscriptresolver.cpp
 
+     collections/dummycollection.cpp
+
      musicscanner.cpp
      shortcuthandler.cpp
      scanmanager.cpp
@@ -83,6 +85,8 @@ SET( tomahawkHeaders ${tomahawkHeaders}
 
      resolvers/scriptresolver.h
      resolvers/qtscriptresolver.h
+
+     collections/dummycollection.h
 
      musicscanner.h
      scanmanager.h
