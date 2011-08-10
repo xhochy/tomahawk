@@ -451,12 +451,12 @@ CollectionItem::dommeClicked()
         m_domme = collection_ptr( new DummyCollection( SourceList::instance()->getLocal() ) );
     }
 
-    m_dommePage = ViewManager::instance()->show( p );
+    m_dommePage = ViewManager::instance()->show( m_domme );
     return m_dommePage;
 }
 
 ViewPage*
 CollectionItem::getDomme() const
 {
-
+    return m_dommePage;
 }

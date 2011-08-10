@@ -36,7 +36,7 @@ class DLLEXPORT DummyCollection : public Tomahawk::Collection
     Q_OBJECT
 
 public:
-    explicit DummyCollection( const Tomahawk::source_ptr& source, QObject* parent = 0 );
+    explicit DummyCollection( const Tomahawk::source_ptr& source, QObject* parent = 0 ) : Collection( source, "DOMME COLLECTION", parent ) {}
     ~DummyCollection()
     {
         qDebug() << Q_FUNC_INFO;
@@ -67,6 +67,9 @@ public:
 
         emit tracksLoaded( tracks, album );
     }
+
+  virtual void addTracks ( const QList< QVariant >& newitems ) {}
+  virtual void removeTracks ( const QDir& dir ) {}
 };
 
 #endif // DUMMYCOLLECTION_H

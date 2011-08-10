@@ -32,6 +32,8 @@ set( libSources
     viewmanager.cpp
     globalactionmanager.cpp
     contextmenu.cpp
+ 
+    collections/dummycollection.cpp
 
     sip/SipPlugin.cpp
     sip/SipHandler.cpp
@@ -209,6 +211,8 @@ set( libHeaders
     viewmanager.h
     globalactionmanager.h
     contextmenu.h
+
+    collections/dummycollection.h
 
     artist.h
     album.h
