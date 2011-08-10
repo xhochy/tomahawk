@@ -31,7 +31,6 @@ void
 DatabaseCommand_AllTracks::exec( DatabaseImpl* dbi )
 {
     TomahawkSqlQuery query = dbi->newquery();
-    QList<Tomahawk::query_ptr> ql;
 
     QString m_orderToken, sourceToken;
     switch ( m_sortOrder )
@@ -150,9 +149,6 @@ DatabaseCommand_AllTracks::exec( DatabaseImpl* dbi )
 
         results << result;
     }
-
-    qDebug() << Q_FUNC_INFO << ql.length();
-
 
     emit tracks( results, Tomahawk::Album::get( m_album->id(), m_album->name(), m_album->artist() ) ); //FIXME: ugly way of getting the shared pointer, use shared pointers all over
     emit done( m_collection );
