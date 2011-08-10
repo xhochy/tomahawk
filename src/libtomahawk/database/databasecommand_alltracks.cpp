@@ -89,6 +89,7 @@ DatabaseCommand_AllTracks::exec( DatabaseImpl* dbi )
     query.prepare( sql );
     query.exec();
 
+    QList<Tomahawk::result_ptr> results;
     while( query.next() )
     {
         Tomahawk::result_ptr result = Tomahawk::result_ptr( new Tomahawk::Result() );
@@ -146,16 +147,13 @@ DatabaseCommand_AllTracks::exec( DatabaseImpl* dbi )
 
         result->setAttributes( attr );
 
-        QList<Tomahawk::result_ptr> results;
-        results << result;
-        qry->addResults( results );
-        qry->setResolveFinished( true );
 
-        ql << qry;
+        results << result;
     }
 
     qDebug() << Q_FUNC_INFO << ql.length();
 
-    emit tracks( ql, data() );
+
+    emit tracks( results, Tomahawk::Album::get( m_album->id(), m_album->name(), m_album->artist() ) ); //FIXME: ugly way of getting the shared pointer, use shared pointers all over
     emit done( m_collection );
 }

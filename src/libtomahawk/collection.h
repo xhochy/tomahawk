@@ -87,7 +87,7 @@ public:
 signals:
     void artistsLoaded( const QList<Tomahawk::artist_ptr>& artists );
     void albumsLoaded( const QList<Tomahawk::album_ptr>& albums, const Tomahawk::artist_ptr& artist );
-    void tracksLoaded( const QList<Tomahawk::result_ptr>& tracks );
+    void tracksLoaded( const QList<Tomahawk::result_ptr>& tracks, const Tomahawk::album_ptr& album );
 
     void tracksAdded( const QList<Tomahawk::query_ptr>& tracks );
     void tracksRemoved( const QList<Tomahawk::query_ptr>& tracks );

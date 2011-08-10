@@ -27,6 +27,7 @@
 #include "databasecommand_loadallstations.h"
 #include "databasecommand_allartists.h"
 #include "databasecommand_allalbums.h"
+#include "databasecommand_alltracks.h"
 
 #include "utils/logger.h"
 
@@ -118,7 +119,14 @@ DatabaseCollection::loadAlbums(const artist_ptr& artist)
 void
 DatabaseCollection::loadTracks(const album_ptr& album)
 {
-    Tomahawk::Collection::loadTracks(album);
+    DatabaseCommand_AllTracks* cmd = new DatabaseCommand_AllTracks( source()->collection() );
+
+    cmd->setAlbum( album.data() );
+
+    connect( cmd, SIGNAL( tracks( QList<Tomahawk::result_ptr>, Tomahawk::album_ptr ) ),
+             SIGNAL( tracksLoaded( QList<Tomahawk::result_ptr>, Tomahawk::album_ptr ) ) );
+
+    Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
 }
 
 

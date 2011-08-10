@@ -414,19 +414,12 @@ TreeModel::addTracks( const album_ptr& album, const QModelIndex& parent )
     qDebug() << Q_FUNC_INFO;
 
     emit loadingStarted();
-    DatabaseCommand_AllTracks* cmd = new DatabaseCommand_AllTracks( m_collection );
-    cmd->setAlbum( album.data() );
-//    cmd->setArtist( album->artist().data() );
 
-    QList< QVariant > rows;
-    rows << parent.row();
-    rows << parent.parent().row();
-    cmd->setData( QVariant( rows ) );
+    connect( m_collection.data(), SIGNAL( tracksLoaded( QList<Tomahawk::result_ptr>, Tomahawk::album_ptr ) ),
+             SLOT( onTracksAdded( QList<Tomahawk::result_ptr>, Tomahawk::album_ptr ) ) );
 
-    connect( cmd, SIGNAL( tracks( QList<Tomahawk::query_ptr>, QVariant ) ),
-                    SLOT( onTracksAdded( QList<Tomahawk::query_ptr>, QVariant ) ) );
-
-    Database::instance()->enqueue( QSharedPointer<DatabaseCommand>( cmd ) );
+    m_albumIndices.insert( album, QPair< QPersistentModelIndex, QPersistentModelIndex>( parent, parent.parent() ) );
+    m_collection->loadTracks( album );
 }
 
 
@@ -562,15 +555,17 @@ TreeModel::onAlbumsAdded( const QList<Tomahawk::album_ptr>& albums, const Tomaha
 
 
 void
-TreeModel::onTracksAdded( const QList<Tomahawk::query_ptr>& tracks, const QVariant& data )
+TreeModel::onTracksAdded( const QList<Tomahawk::result_ptr>& tracks, const Tomahawk::album_ptr& album )
 {
     qDebug() << Q_FUNC_INFO << tracks.count();
     if ( !tracks.count() )
         return;
 
-    QList< QVariant > rows = data.toList();
+    // indices.first is album, indices.second is artist
+    QPair< QPersistentModelIndex, QPersistentModelIndex > indices = m_albumIndices.value( album );
+    m_albumIndices.remove( album );
 
-    QModelIndex parent = index( rows.first().toUInt(), 0, index( rows.at( 1 ).toUInt(), 0, QModelIndex() ) );
+    QModelIndex parent = index( indices.first.row(), 0, index( indices.second.row(), 0, QModelIndex() ) );
     TreeModelItem* parentItem = itemFromIndex( parent );
 
     // the -1 is because we fake a rowCount of 1 to trigger Qt calling fetchMore()
@@ -583,10 +578,9 @@ TreeModel::onTracksAdded( const QList<Tomahawk::query_ptr>& tracks, const QVaria
         emit beginInsertRows( parent, crows.first + 1, crows.second );
 
     TreeModelItem* item = 0;
-    foreach( const query_ptr& query, tracks )
+    foreach( const result_ptr& result, tracks )
     {
-        qDebug() << query->toString();
-        item = new TreeModelItem( query->results().first(), parentItem );
+        item = new TreeModelItem( result, parentItem );
         item->index = createIndex( parentItem->children.count() - 1, 0, item );
 
         connect( item, SIGNAL( dataChanged() ), SLOT( onDataChanged() ) );

@@ -123,7 +123,7 @@ protected:
 private slots:
     void onArtistsAdded( const QList<Tomahawk::artist_ptr>& artists );
     void onAlbumsAdded( const QList<Tomahawk::album_ptr>& albums, const Tomahawk::artist_ptr& artist );
-    void onTracksAdded( const QList<Tomahawk::query_ptr>& tracks, const QVariant& data );
+    void onTracksAdded( const QList<Tomahawk::result_ptr>& tracks, const Tomahawk::album_ptr& album );
 
     void infoSystemInfo( Tomahawk::InfoSystem::InfoRequestData requestData, QVariant output );
     void infoSystemFinished( QString target );
@@ -140,7 +140,8 @@ private:
     QString m_title;
     QString m_description;
 
-    QHash<Tomahawk::artist_ptr, QModelIndex> m_artistIndices;
+    QHash< Tomahawk::artist_ptr, QPersistentModelIndex > m_artistIndices;
+    QHash< Tomahawk::album_ptr, QPair< QPersistentModelIndex, QPersistentModelIndex> > m_albumIndices;
 
     Tomahawk::collection_ptr m_collection;
 };
