@@ -25,6 +25,8 @@
 #include "utils/logger.h"
 #include <widgets/SocialPlaylistWidget.h>
 #include <playlist/customplaylistview.h>
+#include <collections/dummycollection.h>
+#include <sourcelist.h>
 
 /// CollectionItem
 
@@ -43,6 +45,7 @@ CollectionItem::CollectionItem(  SourcesModel* mdl, SourceTreeItem* parent, cons
     , m_sourceInfoPage( 0 )
     , m_coolPlaylistsPage( 0 )
     , m_lovedTracksPage( 0 )
+    , m_dommePage( 0 )
 {
 
     m_lovedTracksItem = new GenericPageItem( model(), this, ( m_source.isNull() ? tr( "Top Loved Tracks" ) : tr( "Loved Tracks" ) ), QIcon( RESPATH "images/loved_playlist.png" ),
@@ -61,6 +64,12 @@ CollectionItem::CollectionItem(  SourcesModel* mdl, SourceTreeItem* parent, cons
                              boost::bind( &ViewManager::welcomeWidget, ViewManager::instance() )
                                                     );
         recent->setSortValue( -300 );
+
+        m_dommeItem = new GenericPageItem( model(), this, tr( "THE DOMME" ), QIcon( RESPATH "images/recently-played.png" ),
+                                                                boost::bind( &CollectionItem::dommeClicked, this ),
+                                                                boost::bind( &CollectionItem::getDomme, this )
+        );
+        recent->setSortValue( 10 );
 
         // TODO finish implementing and making pretty
 //         m_coolPlaylistsItem = new GenericPageItem( model(), this, tr( "Cool Stuff" ), QIcon( RESPATH "images/new-additions.png" ),
@@ -431,4 +440,23 @@ ViewPage*
 CollectionItem::getLovedTracksPage() const
 {
     return m_lovedTracksPage;
+}
+
+ViewPage*
+CollectionItem::dommeClicked()
+{
+    ViewManager::instance()->setTreeMode();
+    if ( !m_dommePage )
+    {
+        m_domme = collection_ptr( new DummyCollection( SourceList::instance()->getLocal() ) );
+    }
+
+    m_dommePage = ViewManager::instance()->show( p );
+    return m_dommePage;
+}
+
+ViewPage*
+CollectionItem::getDomme() const
+{
+
 }

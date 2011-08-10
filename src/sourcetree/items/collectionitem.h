@@ -64,6 +64,9 @@ private slots:
     Tomahawk::ViewPage* lovedTracksClicked();
     Tomahawk::ViewPage* getLovedTracksPage() const;
 
+    // ACTIVATE DOMME
+    Tomahawk::ViewPage* dommeClicked();
+    Tomahawk::ViewPage* getDomme() const;
 private:
     void playlistsAddedInternal( SourceTreeItem* parent, const QList< Tomahawk::dynplaylist_ptr >& playlists );
     template< typename T >
@@ -77,11 +80,15 @@ private:
     GenericPageItem* m_sourceInfoItem;
     GenericPageItem* m_coolPlaylistsItem;
     GenericPageItem* m_lovedTracksItem;
+    GenericPageItem* m_dommeItem;
 
     Tomahawk::ViewPage* m_curTempPage;
     Tomahawk::ViewPage* m_sourceInfoPage;
     Tomahawk::ViewPage* m_coolPlaylistsPage;
     Tomahawk::ViewPage* m_lovedTracksPage;
+
+    Tomahawk::collection_ptr m_domme;
+    Tomahawk::ViewPage* m_dommePage;
 };
 
 
