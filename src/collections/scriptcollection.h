@@ -19,6 +19,7 @@
 #ifndef SCRIPTCOLLECTION_H
 #define SCRIPTCOLLECTION_H
 
+#include "resolvers/qtscriptresolver.h"
 #include "collection.h"
 #include "typedefs.h"
 
@@ -31,14 +32,13 @@
 
 #include "dllmacro.h"
 
+
 class DLLEXPORT ScriptCollection : public Tomahawk::Collection
 {
     Q_OBJECT
 
 public:
-    explicit ScriptCollection( const Tomahawk::source_ptr& source, QObject* parent = 0 ) : Collection( source, "SCRIPT COLLECTION", parent )
-    {
-    }
+    explicit ScriptCollection( const Tomahawk::source_ptr& source, QtScriptResolver* resolver, QObject* parent = 0 );
     ~ScriptCollection()
     {
         qDebug() << Q_FUNC_INFO;
@@ -48,8 +48,8 @@ public:
     virtual void loadAlbums( const Tomahawk::artist_ptr& artist );
     virtual void loadTracks( const Tomahawk::album_ptr& album );
 
-    virtual void addTracks ( const QList< QVariant >& newitems ) {}
-    virtual void removeTracks ( const QDir& dir ) {}
+private:
+    QtScriptResolver* m_resolver;
 };
 
 #endif // SCRIPTCOLLECTION_H

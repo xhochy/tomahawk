@@ -34,7 +34,6 @@ set( libSources
     contextmenu.cpp
 
     collections/dummycollection.cpp
-    collections/scriptcollection.cpp
 
     sip/SipPlugin.cpp
     sip/SipHandler.cpp
@@ -214,7 +213,6 @@ set( libHeaders
     contextmenu.h
 
     collections/dummycollection.h
-    collections/scriptcollection.h
 
     artist.h
     album.h

@@ -165,11 +165,10 @@ QtScriptResolver::reload()
 void
 QtScriptResolver::loadCollections()
 {
-    Tomahawk::collection_ptr collection1( new ScriptCollection( SourceList::instance()->getLocal() ) );
-    collection1->setName( "Domme Collection 1" );
+    Tomahawk::collection_ptr collection1( new ScriptCollection( SourceList::instance()->getLocal(), this ) );
     emit collectionAdded( collection1 );
 
-    Tomahawk::collection_ptr collection2( new DummyCollection( SourceList::instance()->getLocal() ) );
+    Tomahawk::collection_ptr collection2( new DummyCollection( SourceList::instance()->getLocal(), this ) );
     collection2->setName( "Domme Collection 2" );
     emit collectionAdded( collection2 );
 }
@@ -463,6 +462,13 @@ QtScriptResolver::fillDataInWidgets( const QVariantMap& data )
 
         setWidgetData( data[ name ], widget, propertyName );
     }
+}
+
+
+QVariant
+QtScriptResolver::runJS( const QString& code )
+{
+    return m_engine->mainFrame()->evaluateJavaScript( code );
 }
 
 

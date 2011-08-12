@@ -104,8 +104,8 @@ signals:
     void stationsDeleted( const QList<Tomahawk::dynplaylist_ptr>& );
 
 public slots:
-    virtual void addTracks( const QList<QVariant>& newitems ) = 0;
-    virtual void removeTracks( const QDir& dir ) = 0;
+    virtual void addTracks( const QList<QVariant>& newitems ) {};
+    virtual void removeTracks( const QDir& dir ) {};
 
     void setPlaylists( const QList<Tomahawk::playlist_ptr>& plists );
     void setAutoPlaylists( const QList< Tomahawk::dynplaylist_ptr >& autoplists );

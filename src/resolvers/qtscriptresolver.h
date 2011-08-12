@@ -97,6 +97,8 @@ class QtScriptResolver : public Tomahawk::ExternalResolver
 {
 Q_OBJECT
 
+friend class ScriptCollection;
+
 public:
     explicit QtScriptResolver( const QString& scriptPath );
     virtual ~QtScriptResolver();
@@ -131,6 +133,7 @@ private:
     void fillDataInWidgets( const QVariantMap& data );
 
     // encapsulate javascript calls
+    QVariant runJS( const QString& code );
     QVariantMap resolverSettings();
     QVariantMap resolverUserConfig();
     QVariantMap resolverInit();
