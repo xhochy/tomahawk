@@ -27,6 +27,7 @@
 #include <playlist/customplaylistview.h>
 #include <collections/dummycollection.h>
 #include <sourcelist.h>
+#include <QApplication>
 
 /// CollectionItem
 
@@ -45,7 +46,6 @@ CollectionItem::CollectionItem(  SourcesModel* mdl, SourceTreeItem* parent, cons
     , m_sourceInfoPage( 0 )
     , m_coolPlaylistsPage( 0 )
     , m_lovedTracksPage( 0 )
-    , m_dommePage( 0 )
 {
 
     m_lovedTracksItem = new GenericPageItem( model(), this, ( m_source.isNull() ? tr( "Top Loved Tracks" ) : tr( "Loved Tracks" ) ), QIcon( RESPATH "images/loved_playlist.png" ),
@@ -65,12 +65,6 @@ CollectionItem::CollectionItem(  SourcesModel* mdl, SourceTreeItem* parent, cons
                                                     );
         recent->setSortValue( -300 );
 
-        m_dommeItem = new GenericPageItem( model(), this, tr( "THE DOMME" ), QIcon( RESPATH "images/recently-played.png" ),
-                                                                boost::bind( &CollectionItem::dommeClicked, this ),
-                                                                boost::bind( &CollectionItem::getDomme, this )
-        );
-        recent->setSortValue( 10 );
-
         // TODO finish implementing and making pretty
 //         m_coolPlaylistsItem = new GenericPageItem( model(), this, tr( "Cool Stuff" ), QIcon( RESPATH "images/new-additions.png" ),
 //                                                    boost::bind( &CollectionItem::coolPlaylistsClicked, this ),
@@ -80,6 +74,12 @@ CollectionItem::CollectionItem(  SourcesModel* mdl, SourceTreeItem* parent, cons
 
 
         return;
+    }
+
+    if( m_source.data() == SourceList::instance()->getLocal().data() )
+    {
+        connect( QApplication::instance(), SIGNAL( resolverCollectionAdded( Tomahawk::collection_ptr ) ),
+                SLOT( addSubCollection( Tomahawk::collection_ptr ) ) );
     }
 
     m_sourceInfoItem = new GenericPageItem( model(), this, tr( "New Additions" ), QIcon( RESPATH "images/new-additions.png" ),
@@ -130,6 +130,21 @@ Tomahawk::source_ptr
 CollectionItem::source() const
 {
     return m_source;
+}
+
+
+void
+CollectionItem::addSubCollection( const collection_ptr& collection )
+{
+    tLog() << Q_FUNC_INFO << collection->name();
+    beginRowsAdded( 0, 0 );
+    GenericPageItem* item = new GenericPageItem( model(), this, collection->name(), QIcon( RESPATH "images/recently-played.png" ),
+                                boost::bind( &CollectionItem::subCollectionClicked, this, collection),
+                                boost::bind( &CollectionItem::getSubCollection, this, collection ),
+                                0
+                       );
+    item->setSortValue( -500 );
+    endRowsAdded();
 }
 
 
@@ -442,21 +457,22 @@ CollectionItem::getLovedTracksPage() const
     return m_lovedTracksPage;
 }
 
-ViewPage*
-CollectionItem::dommeClicked()
-{
-    if ( !m_dommePage )
-    {
-        m_domme = collection_ptr( new DummyCollection( SourceList::instance()->getLocal() ) );
-    }
 
-    m_dommePage = ViewManager::instance()->show( m_domme );
+ViewPage*
+CollectionItem::subCollectionClicked( const Tomahawk::collection_ptr& collection )
+{
+    ViewPage* page = ViewManager::instance()->show( collection );
     ViewManager::instance()->setTreeMode();
-    return m_dommePage;
+
+    m_collectionViewPages.insert( collection, page );
+
+    return page;
 }
 
+
 ViewPage*
-CollectionItem::getDomme() const
+CollectionItem::getSubCollection( const collection_ptr& collection ) const
 {
-    return m_dommePage;
+    return m_collectionViewPages.value( collection );
 }
+

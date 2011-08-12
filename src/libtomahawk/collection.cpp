@@ -50,6 +50,13 @@ Collection::~Collection()
 }
 
 
+void
+Collection::setName( const QString& name )
+{
+    m_name = name;
+}
+
+
 QString
 Collection::name() const
 {

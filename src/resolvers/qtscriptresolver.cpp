@@ -27,6 +27,8 @@
 #include <QMetaProperty>
 
 #include "utils/logger.h"
+#include <collections/scriptcollection.h>
+#include <collections/dummycollection.h>
 
 // FIXME: bloody hack, remove this for 0.3
 // this one adds new functionality to old resolvers
@@ -157,6 +159,19 @@ QtScriptResolver::reload()
     {
         m_error = Tomahawk::ExternalResolver::FileNotFound;
     }
+}
+
+
+void
+QtScriptResolver::loadCollections()
+{
+    Tomahawk::collection_ptr collection1( new ScriptCollection( SourceList::instance()->getLocal() ) );
+    collection1->setName( "Domme Collection 1" );
+    emit collectionAdded( collection1 );
+
+    Tomahawk::collection_ptr collection2( new DummyCollection( SourceList::instance()->getLocal() ) );
+    collection2->setName( "Domme Collection 2" );
+    emit collectionAdded( collection2 );
 }
 
 

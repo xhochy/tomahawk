@@ -43,6 +43,10 @@ public:
     void setStationsCategory( CategoryItem* item ) { m_stations = item; }
     void setPlaylistsCategory( CategoryItem* item ) { m_playlists = item; }
 
+public slots:
+    //FIXME: find reasonable name
+    void addSubCollection( const Tomahawk::collection_ptr& collection );
+
 private slots:
     void onPlaylistsAdded( const QList<Tomahawk::playlist_ptr>& playlists );
     void onPlaylistDeleted( const Tomahawk::playlist_ptr& playlists );
@@ -64,10 +68,10 @@ private slots:
     Tomahawk::ViewPage* lovedTracksClicked();
     Tomahawk::ViewPage* getLovedTracksPage() const;
 
-    // ACTIVATE DOMME
-    Tomahawk::ViewPage* dommeClicked();
-    Tomahawk::ViewPage* getDomme() const;
-private:
+    Tomahawk::ViewPage* subCollectionClicked( const Tomahawk::collection_ptr& collection );
+    Tomahawk::ViewPage* getSubCollection( const Tomahawk::collection_ptr& collection ) const;
+
+    private:
     void playlistsAddedInternal( SourceTreeItem* parent, const QList< Tomahawk::dynplaylist_ptr >& playlists );
     template< typename T >
     void playlistDeletedInternal( SourceTreeItem* parent, const T& playlists );
@@ -80,15 +84,13 @@ private:
     GenericPageItem* m_sourceInfoItem;
     GenericPageItem* m_coolPlaylistsItem;
     GenericPageItem* m_lovedTracksItem;
-    GenericPageItem* m_dommeItem;
 
     Tomahawk::ViewPage* m_curTempPage;
     Tomahawk::ViewPage* m_sourceInfoPage;
     Tomahawk::ViewPage* m_coolPlaylistsPage;
     Tomahawk::ViewPage* m_lovedTracksPage;
 
-    Tomahawk::collection_ptr m_domme;
-    Tomahawk::ViewPage* m_dommePage;
+    QHash< Tomahawk::collection_ptr, Tomahawk::ViewPage* > m_collectionViewPages;
 };
 
 

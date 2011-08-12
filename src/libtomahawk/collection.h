@@ -52,6 +52,8 @@ public:
 
     virtual void setLoaded() { m_isLoaded = true; }
     virtual bool isLoaded() const { return m_isLoaded; }
+
+    virtual void setName( const QString& name );
     virtual QString name() const;
 
     virtual void loadArtists() { tLog() << Q_FUNC_INFO; }

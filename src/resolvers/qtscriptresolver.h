@@ -111,6 +111,8 @@ public:
     virtual ExternalResolver::ErrorState error() const;
     virtual void reload();
 
+    virtual void loadCollections();
+
 public slots:
     virtual void resolve( const Tomahawk::query_ptr& query );
     virtual void stop();

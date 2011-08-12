@@ -118,7 +118,6 @@ private:
     void loadPlugins();
 
     QList<Tomahawk::collection_ptr> m_collections;
-    QHash<QString, Tomahawk::ExternalResolver*> m_scriptResolvers;
 
     QWeakPointer<Database> m_database;
     QWeakPointer<ScanManager> m_scanManager;
@@ -141,6 +140,13 @@ private:
 
     QxtHttpServerConnector m_connector;
     QxtHttpSessionManager m_session;
+
+/**
+ * source this out to a dedicated resolver manager
+ */
+    QHash<QString, Tomahawk::ExternalResolver*> m_scriptResolvers;
+signals:
+    void resolverCollectionAdded( const Tomahawk::collection_ptr& collection );
 };
 
 #endif // TOMAHAWKAPP_H

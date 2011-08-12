@@ -74,11 +74,14 @@ public:
     virtual void reload() {} // Reloads from file (especially useful to check if file now exists)
     virtual ErrorState error() const;
 
+    virtual void loadCollections() {}
+
 public slots:
     virtual void stop() = 0;
 
 signals:
     void changed(); // if config widget was added/removed
+    void collectionAdded( const Tomahawk::collection_ptr& collection );
 
 protected:
     QWidget* widgetFromData( QByteArray& data, QWidget* parent = 0 );

@@ -416,10 +416,20 @@ void
 TomahawkApp::enableScriptResolver( const QString& path )
 {
     const QFileInfo fi( path );
+    Tomahawk::ExternalResolver* resolver;
     if ( fi.suffix() == "js" || fi.suffix() == "script" )
-        m_scriptResolvers.insert( path, new QtScriptResolver( path ) );
+        resolver = new QtScriptResolver( path );
     else
-        m_scriptResolvers.insert( path, new ScriptResolver( path ) );
+        resolver = new ScriptResolver( path );
+
+    connect( resolver, SIGNAL( collectionAdded( Tomahawk::collection_ptr ) ),
+             this, SLOT( onResolverCollectionAdded( Tomahawk::collection_ptr ) ) );
+    connect( resolver, SIGNAL( collectionAdded( Tomahawk::collection_ptr ) ),
+             this, SIGNAL( resolverCollectionAdded( Tomahawk::collection_ptr ) ) );
+
+    resolver->loadCollections();
+
+    m_scriptResolvers.insert( path, resolver );
 }
 
 

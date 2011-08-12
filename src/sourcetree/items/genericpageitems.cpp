@@ -24,8 +24,8 @@ using namespace Tomahawk;
 
 
 /// Generic page item
-GenericPageItem::GenericPageItem( SourcesModel* model, SourceTreeItem* parent, const QString& text, const QIcon& icon, boost::function< ViewPage* () > show, boost::function< ViewPage* () > get )
-    : SourceTreeItem( model, parent, SourcesModel::GenericPage )
+GenericPageItem::GenericPageItem( SourcesModel* model, SourceTreeItem* parent, const QString& text, const QIcon& icon, boost::function< ViewPage* () > show, boost::function< ViewPage* () > get, int index )
+    : SourceTreeItem( model, parent, SourcesModel::GenericPage, index )
     , m_icon( icon )
     , m_text( text )
     , m_sortValue( 0 )
