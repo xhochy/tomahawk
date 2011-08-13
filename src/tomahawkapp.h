@@ -147,6 +147,7 @@ private:
     QHash<QString, Tomahawk::ExternalResolver*> m_scriptResolvers;
 signals:
     void resolverCollectionAdded( const Tomahawk::collection_ptr& collection );
+    void resolverCollectionRemoved( const Tomahawk::collection_ptr& collection );
 };
 
 #endif // TOMAHAWKAPP_H

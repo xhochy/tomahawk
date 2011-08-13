@@ -64,7 +64,7 @@ public:
         FileNotFound
     };
 
-    ExternalResolver( const QString& filePath ) { m_filePath = filePath; }
+    ExternalResolver( const QString& filePath );
 
     virtual QString filePath() const { return m_filePath; }
 
@@ -82,6 +82,7 @@ public slots:
 signals:
     void changed(); // if config widget was added/removed
     void collectionAdded( const Tomahawk::collection_ptr& collection );
+    void collectionRemoved( const Tomahawk::collection_ptr& collection );
 
 protected:
     QWidget* widgetFromData( QByteArray& data, QWidget* parent = 0 );
@@ -89,6 +90,12 @@ protected:
     QByteArray fixDataImagePaths( const QByteArray& data, bool compressed, const QVariantMap& images );
 
     void setFilePath( const QString& path ) { m_filePath = path; }
+
+protected slots:
+    virtual void onCollectionAdded( const Tomahawk::collection_ptr& collection );
+
+protected:
+    QList< Tomahawk::collection_ptr > m_collections;
 
 private:
     void addChildProperties( QObject* parent, QVariantMap& m );

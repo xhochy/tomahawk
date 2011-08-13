@@ -423,9 +423,10 @@ TomahawkApp::enableScriptResolver( const QString& path )
         resolver = new ScriptResolver( path );
 
     connect( resolver, SIGNAL( collectionAdded( Tomahawk::collection_ptr ) ),
-             this, SLOT( onResolverCollectionAdded( Tomahawk::collection_ptr ) ) );
-    connect( resolver, SIGNAL( collectionAdded( Tomahawk::collection_ptr ) ),
              this, SIGNAL( resolverCollectionAdded( Tomahawk::collection_ptr ) ) );
+
+    connect( resolver, SIGNAL( collectionRemoved( Tomahawk::collection_ptr ) ),
+             this, SIGNAL( resolverCollectionRemoved( Tomahawk::collection_ptr ) ) );
 
     resolver->loadCollections();
 

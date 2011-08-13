@@ -46,6 +46,7 @@ public:
 public slots:
     //FIXME: find reasonable name
     void addSubCollection( const Tomahawk::collection_ptr& collection );
+    void removeSubCollection( const Tomahawk::collection_ptr& collection );
 
 private slots:
     void onPlaylistsAdded( const QList<Tomahawk::playlist_ptr>& playlists );

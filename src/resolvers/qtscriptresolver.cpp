@@ -313,6 +313,13 @@ QtScriptResolver::resolve( const Tomahawk::query_ptr& query )
 void
 QtScriptResolver::stop()
 {
+    // unregister collections
+    foreach( const Tomahawk::collection_ptr& collection, m_collections)
+    {
+        emit collectionRemoved( collection );
+    }
+    m_collections.clear();
+
     m_stopped = true;
     emit finished();
 }

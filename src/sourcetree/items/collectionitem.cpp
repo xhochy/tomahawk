@@ -80,6 +80,9 @@ CollectionItem::CollectionItem(  SourcesModel* mdl, SourceTreeItem* parent, cons
     {
         connect( QApplication::instance(), SIGNAL( resolverCollectionAdded( Tomahawk::collection_ptr ) ),
                 SLOT( addSubCollection( Tomahawk::collection_ptr ) ) );
+        connect( QApplication::instance(), SIGNAL( resolverCollectionRemoved( Tomahawk::collection_ptr ) ),
+                 SLOT( removeSubCollection( Tomahawk::collection_ptr ) ) );
+
     }
 
     m_sourceInfoItem = new GenericPageItem( model(), this, tr( "New Additions" ), QIcon( RESPATH "images/new-additions.png" ),
@@ -139,13 +142,23 @@ CollectionItem::addSubCollection( const collection_ptr& collection )
     tLog() << Q_FUNC_INFO << collection->name();
     beginRowsAdded( 0, 0 );
     GenericPageItem* item = new GenericPageItem( model(), this, collection->name(), QIcon( RESPATH "images/recently-played.png" ),
-                                boost::bind( &CollectionItem::subCollectionClicked, this, collection),
+                                boost::bind( &CollectionItem::subCollectionClicked, this, collection ),
                                 boost::bind( &CollectionItem::getSubCollection, this, collection ),
                                 0
                        );
     item->setSortValue( -500 );
     endRowsAdded();
 }
+
+
+void
+CollectionItem::removeSubCollection(const collection_ptr& collection)
+{
+    tLog() << Q_FUNC_INFO;
+    Q_ASSERT(false);
+
+}
+
 
 
 QString

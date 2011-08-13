@@ -27,6 +27,16 @@
 
 #include "utils/logger.h"
 
+
+Tomahawk::ExternalResolver::ExternalResolver(const QString& filePath)
+{
+    m_filePath = filePath;
+
+    connect( this, SIGNAL( collectionAdded( Tomahawk::collection_ptr ) ),
+             this, SLOT( onCollectionAdded( Tomahawk::collection_ptr ) ) );
+}
+
+
 Tomahawk::ExternalResolver::ErrorState
 Tomahawk::ExternalResolver::error() const
 {
@@ -121,3 +131,9 @@ Tomahawk::ExternalResolver::fixDataImagePaths( const QByteArray& data, bool comp
     return uiFile.toUtf8();
 }
 
+
+void
+Tomahawk::ExternalResolver::onCollectionAdded(const Tomahawk::collection_ptr& collection)
+{
+    m_collections.append( collection );
+}
