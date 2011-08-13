@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <iostream>
+
 #include <QPluginLoader>
 #include <QDir>
 #include <QMetaType>
@@ -110,8 +112,6 @@ using namespace Tomahawk;
 TomahawkApp::TomahawkApp( int& argc, char *argv[] )
     : TOMAHAWK_APPLICATION( argc, argv )
 {
-    qDebug() << "TomahawkApp thread:" << thread();
-
     setOrganizationName( QLatin1String( TOMAHAWK_ORGANIZATION_NAME ) );
     setOrganizationDomain( QLatin1String( TOMAHAWK_ORGANIZATION_DOMAIN ) );
     setApplicationName( QLatin1String( TOMAHAWK_APPLICATION_NAME ) );
@@ -124,6 +124,13 @@ TomahawkApp::TomahawkApp( int& argc, char *argv[] )
 void
 TomahawkApp::init()
 {
+    if ( arguments().contains( "--help" ) || arguments().contains( "-h" ) )
+    {
+        printHelp();
+        ::exit(0);
+    }
+
+    qDebug() << "TomahawkApp thread:" << thread();
     Logger::setupLogfile();
     qsrand( QTime( 0, 0, 0 ).secsTo( QTime::currentTime() ) );
 
@@ -241,6 +248,11 @@ TomahawkApp::init()
     tDebug() << "Init Scrobbler.";
     m_scrobbler = new Scrobbler( this );
 #endif
+
+    if ( arguments().contains( "--filescan" ) )
+    {
+        m_scanManager.data()->runScan( true );
+    }
 }
 
 
@@ -290,6 +302,24 @@ TomahawkApp*
 TomahawkApp::instance()
 {
     return (TomahawkApp*)TOMAHAWK_APPLICATION::instance();
+}
+
+
+void
+TomahawkApp::printHelp()
+{
+    #define echo( X ) std::cout << QString( X ).toAscii().data()
+
+    echo( "Usage: " + arguments().at( 0 ) + " [options] [url]\n" );
+    echo( "Options are:\n" );
+    echo( "  --help         Show this help\n" );
+    echo( "  --http         Initialize HTTP server\n" );
+    echo( "  --filescan     Scan for files on startup\n" );
+    echo( "  --testdb       Use a test database instead of real collection\n" );
+    echo( "  --noupnp       Disable UPNP\n" );
+    echo( "  --nosip        Disable SIP\n" );
+    echo( "\nurl is a tomahawk:// command or alternatively a url that Tomahawk can recognize.\n" );
+    echo( "For more documentation, see http://wiki.tomahawk-player.org/mediawiki/index.php/Tomahawk://_Links\n" );
 }
 
 
@@ -533,6 +563,8 @@ TomahawkApp::loadUrl( const QString& url )
         return GlobalActionManager::instance()->parseTomahawkLink( url );
     else if ( url.contains( "open.spotify.com" ) || url.contains( "spotify:track" ) )
         return GlobalActionManager::instance()->openSpotifyLink( url );
+    else if ( url.contains( "www.rdio.com" ) )
+        return GlobalActionManager::instance()->openRdioLink( url );
     else
     {
         QFile f( url );

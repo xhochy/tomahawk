@@ -80,14 +80,27 @@ TreeItemDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
             QStyleOptionViewItemV4 o( *vioption );
             o.palette.setColor( QPalette::Text, textColor );
 
+            if ( o.state & QStyle::State_Selected && o.state & QStyle::State_Active )
+            {
+                o.palette.setColor( QPalette::Text, o.palette.color( QPalette::HighlightedText ) );
+            }
+
             if ( item->isPlaying() )
             {
                 o.palette.setColor( QPalette::Highlight, o.palette.color( QPalette::Mid ) );
-                o.palette.setColor( QPalette::Text, o.palette.color( QPalette::HighlightedText ) );
+                if ( o.state & QStyle::State_Selected )
+                    o.palette.setColor( QPalette::Text, textColor );
                 o.state |= QStyle::State_Selected;
             }
 
+#ifdef Q_OS_MAC
+            int oldX = o.rect.x();
+            o.rect.setX( 0 );
+#endif
             qApp->style()->drawControl( QStyle::CE_ItemViewItem, &o, painter );
+#ifdef Q_OS_MAC
+            o.rect.setX( oldX );
+#endif
 
             {
                 QRect r = o.rect.adjusted( 3, 0, 0, 0 );
@@ -99,6 +112,7 @@ TreeItemDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
                     painter->drawPixmap( r.adjusted( 3, 1, 18 - r.width(), 1 ), m_nowPlayingIcon );
                     r.adjust( 25, 0, 0, 3 );
                 }
+
 
                 painter->setPen( o.palette.text().color() );
 
