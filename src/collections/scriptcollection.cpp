@@ -48,7 +48,13 @@ ScriptCollection::loadAlbums(const Tomahawk::artist_ptr& artist)
 void
 ScriptCollection::loadTracks(const Tomahawk::album_ptr& album)
 {
-    QList< Tomahawk::result_ptr > tracks;
+    QVariant results = m_resolver->runJS(
+        QString("Tomahawk.resolver.instance.getTracks(\"%1\", \"%2\");")
+            .arg( album->artist()->name() )
+            .arg( album->name() )
+    );
+
+    QList< Tomahawk::result_ptr > tracks = m_resolver->parseResultVariantList( results.toList() );
 
     emit tracksLoaded( tracks, album );
 }

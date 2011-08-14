@@ -586,8 +586,10 @@ TreeModel::onTracksAdded( const QList<Tomahawk::result_ptr>& tracks, const Tomah
         connect( item, SIGNAL( dataChanged() ), SLOT( onDataChanged() ) );
     }
 
+    qDebug() << "FOOOOO";
     if ( !parent.isValid() || crows.second > 0 )
         emit endInsertRows();
+    qDebug() << "BAAAAR";
 
     emit dataChanged( item->index.sibling( 0, 0 ), item->index.sibling( item->index.row(), columnCount( QModelIndex() ) - 1 ) );
 
