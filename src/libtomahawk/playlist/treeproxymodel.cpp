@@ -101,7 +101,7 @@ TreeProxyModel::filterAcceptsRow( int sourceRow, const QModelIndex& sourceParent
             }
         }
 
-        tDebug() << "Accepting:" << pi->result()->toString() << pi->result()->collection()->source()->id();
+        tDebug() << "Accepting:" << pi->result()->toString();
         m_cache.insertMulti( sourceParent, pi->result() );
     }
 
