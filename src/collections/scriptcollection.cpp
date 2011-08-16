@@ -54,7 +54,7 @@ ScriptCollection::loadTracks(const Tomahawk::album_ptr& album)
             .arg( album->name() )
     );
 
-    QList< Tomahawk::result_ptr > tracks = m_resolver->parseResultVariantList( results.toList() );
+    QList< Tomahawk::result_ptr > tracks = m_resolver->parseResultVariantList( results.toMap().value("results").toList() );
 
     emit tracksLoaded( tracks, album );
 }

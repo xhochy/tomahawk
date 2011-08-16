@@ -472,7 +472,7 @@ TreeModel::addFilteredCollection( const collection_ptr& collection, unsigned int
 void
 TreeModel::onArtistsAdded( const QList<Tomahawk::artist_ptr>& artists )
 {
-    tDebug() << Q_FUNC_INFO;
+    tDebug() << Q_FUNC_INFO << artists.count();
 
     if ( !artists.count() )
         return;
