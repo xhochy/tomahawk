@@ -156,6 +156,8 @@ CollectionItem::addSubCollection( const collection_ptr& collection )
                        );
     item->setSortValue( -500 );
     endRowsAdded();
+
+    m_collectionPageItems.insert( collection, item );
 }
 
 
@@ -163,8 +165,15 @@ void
 CollectionItem::removeSubCollection(const collection_ptr& collection)
 {
     tLog() << Q_FUNC_INFO;
-    Q_ASSERT(false);
 
+    GenericPageItem* page = m_collectionPageItems.value( collection );
+    int i = children().indexOf( page );
+
+    beginRowsRemoved( i, i );
+    removeChild( page );
+    endRowsRemoved();
+
+    m_collectionPageItems.remove( collection );
 }
 
 

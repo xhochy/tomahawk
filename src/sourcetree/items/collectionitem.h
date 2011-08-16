@@ -97,6 +97,7 @@ private slots:
     Tomahawk::ViewPage* m_lovedTracksPage;
 
     QHash< Tomahawk::collection_ptr, Tomahawk::ViewPage* > m_collectionViewPages;
+    QHash< Tomahawk::collection_ptr, GenericPageItem* > m_collectionPageItems;
 };
 
 
