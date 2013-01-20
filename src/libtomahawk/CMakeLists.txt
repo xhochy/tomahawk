@@ -43,6 +43,7 @@ set( libGuiSources
 
     infobar/InfoBar.cpp
 
+    playlist/InboxModel.cpp
     playlist/FlexibleHeader.cpp
     playlist/FlexibleView.cpp
     playlist/TreeModel.cpp
@@ -265,6 +266,7 @@ list(APPEND libSources
     database/DatabaseCommand_TrackAttributes.cpp
     database/DatabaseCommand_SetTrackAttributes.cpp
     database/DatabaseCommand_PlaybackCharts.cpp
+    database/DatabaseCommand_ShareTrack.cpp
     database/Database.cpp
     database/TomahawkSqlQuery.cpp
     database/IdThreadWorker.cpp

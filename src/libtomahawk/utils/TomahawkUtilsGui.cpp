@@ -708,6 +708,10 @@ defaultPixmap( ImageType type, ImageMode mode, const QSize& size )
             pixmap = ImageRegistry::instance()->pixmap( RESPATH "images/soundcloud.svg", size );
             break;
 
+        case Inbox:
+            pixmap = ImageRegistry::instance()->pixmap( RESPATH "images/downloading.svg", size );
+            break;
+
         default:
             break;
     }
