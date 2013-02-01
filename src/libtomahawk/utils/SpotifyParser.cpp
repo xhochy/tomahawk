@@ -90,7 +90,7 @@ SpotifyParser::lookupUrl( const QString& rawLink )
     QString smpPrefix = "spotify:app:sharemyplaylists:subscribe:playlist:";
     if ( link.startsWith( smpPrefix ) )
     {
-	link = QUrl::fromPercentEncoding(link.mid(smpPrefix.size()).toUtf8());
+        link = QUrl::fromPercentEncoding(link.mid(smpPrefix.size()).toUtf8());
     }
     // TODO: Ignoring search and user querys atm
     // (spotify:(?:(?:artist|album|track|user:[^:]+:playlist):[a-zA-Z0-9]+|user:[^:]+|search:(?:[-\w$\.+!*'(),<>:\s]+|%[a-fA-F0-9\s]{2})+))
