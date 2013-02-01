@@ -20,6 +20,7 @@
 #include "SpotifyParser.h"
 
 #include <QtNetwork/QNetworkAccessManager>
+#include <QUrl>
 
 #include <qjson/parser.h>
 
@@ -84,6 +85,12 @@ SpotifyParser::lookupUrl( const QString& rawLink )
         link.replace( "http://open.spotify.com/", "" );
         link.replace( "/", ":" );
         link = "spotify:" + link;
+    }
+    // ShareMyPlaylist prefixes all playlists with the path to their app, strip it.
+    QString smpPrefix = "spotify:app:sharemyplaylists:subscribe:playlist:";
+    if ( link.startsWith( smpPrefix ) )
+    {
+	link = QUrl::fromPercentEncoding(link.mid(smpPrefix.size()).toUtf8());
     }
     // TODO: Ignoring search and user querys atm
     // (spotify:(?:(?:artist|album|track|user:[^:]+:playlist):[a-zA-Z0-9]+|user:[^:]+|search:(?:[-\w$\.+!*'(),<>:\s]+|%[a-fA-F0-9\s]{2})+))
