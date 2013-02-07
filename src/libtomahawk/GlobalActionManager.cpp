@@ -399,6 +399,39 @@ GlobalActionManager::parseTomahawkLink( const QString& urlIn )
     }
 }
 
+bool GlobalActionManager::handleNewPlaylistCommand( const QUrl& url )
+{
+    QList< Tomahawk::query_ptr > entries;
+    if ( !urlHasQueryItem( url, "title" ) )
+    {
+        tLog() << "New playlist command needs a title...";
+        return false;
+    }
+    // Add tracks to the playlist using track_X_artist and track_X_title where X is the postition (starting at 0)
+    unsigned int trackIndex = 0;
+    QString artistTemplate = QString( "track_%1_artist" );
+    QString titleTemplate = QString( "track_%1_title" );
+    while ( urlHasQueryItem( url, titleTemplate.arg( QString::number(trackIndex) ) ) || urlHasQueryItem( url, artistTemplate.arg( QString::number(trackIndex) ) ) )
+    {
+        if ( !urlHasQueryItem( url, artistTemplate.arg( QString::number( trackIndex ) ) ) )
+        {
+            tLog() << "Each track needs an artist...";
+            return false;
+        }
+        if ( !urlHasQueryItem( url, titleTemplate.arg( QString::number( trackIndex ) ) ) )
+        {
+            tLog() << "Each track needs a title...";
+            return false;
+        }
+        QString artist = urlQueryItemValue( url, artistTemplate.arg( QString::number( trackIndex ) ) );
+        QString title = urlQueryItemValue( url, titleTemplate.arg( QString::number( trackIndex ) ) );
+        entries << Tomahawk::Query::get( artist, title, QString(), uuid(), true );
+        trackIndex++;
+    }
+    playlist_ptr pl = Playlist::create( SourceList::instance()->getLocal(), uuid(), urlQueryItemValue( url, "title" ), QString(), QString(), false, entries );
+    ViewManager::instance()->show( pl );
+    return true;
+}
 
 bool
 GlobalActionManager::handlePlaylistCommand( const QUrl& url )
@@ -430,13 +463,7 @@ GlobalActionManager::handlePlaylistCommand( const QUrl& url )
     }
     else if ( parts [ 0 ] == "new" )
     {
-        if ( !urlHasQueryItem( url, "title" ) )
-        {
-            tLog() << "New playlist command needs a title...";
-            return false;
-        }
-        playlist_ptr pl = Playlist::create( SourceList::instance()->getLocal(), uuid(), urlQueryItemValue( url, "title" ), QString(), QString(), false );
-        ViewManager::instance()->show( pl );
+        handleNewPlaylistCommand( url );
     }
     else if ( parts[ 0 ] == "add" )
     {

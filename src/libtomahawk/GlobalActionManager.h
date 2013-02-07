@@ -105,6 +105,7 @@ private:
 
     /// handle opening of urls
 #ifndef ENABLE_HEADLESS
+    bool handleNewPlaylistCommand( const QUrl& url );
     bool handlePlaylistCommand( const QUrl& url );
     bool handleViewCommand( const QUrl& url );
     bool handleStationCommand( const QUrl& url );
