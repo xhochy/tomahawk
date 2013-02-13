@@ -70,6 +70,12 @@ QVariant variantForImage(const QImage &_image)
 	qDBusRegisterMetaType<SpecImage>();
 
 	QImage image = _image.convertToFormat(QImage::Format_ARGB32);
+  // Scale image to a maximum size of 128px
+  if (image.width() > image.height()) {
+    image = image.scaledToWidth(128);
+  } else {
+    image = image.scaledToHeight(128);
+  }
 
 	int rowStride = image.width() * 4;
 
