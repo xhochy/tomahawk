@@ -446,9 +446,10 @@ QtScriptResolver::init()
     requireJs.close();
 
     // Configure RequireJS
+    m_engine->setScriptPath( "require-config.js" );
     QString baseUrl( "requirejs.config({ baseUrl: 'file://" );
     baseUrl += scriptFileInfo.absoluteDir().absolutePath();
-    baseUrl += "'});'";
+    baseUrl += "'});";
     m_engine->mainFrame()->evaluateJavaScript( baseUrl );
 
     // add resolver
