@@ -418,6 +418,7 @@ void
 QtScriptResolver::init()
 {
     QFile scriptFile( filePath() );
+    QFileInfo scriptFileInfo( scriptFile );
     if( !scriptFile.open( QIODevice::ReadOnly ) )
     {
         qWarning() << "Failed to read contents of file:" << filePath() << scriptFile.errorString();
@@ -436,6 +437,19 @@ QtScriptResolver::init()
     jslib.open( QIODevice::ReadOnly );
     m_engine->mainFrame()->evaluateJavaScript( jslib.readAll() );
     jslib.close();
+
+    // Load RequireJS
+    m_engine->setScriptPath( "require.js" );
+    QFile requireJs( RESPATH "js/require.js" );
+    requireJs.open( QIODevice::ReadOnly );
+    m_engine->mainFrame()->evaluateJavaScript( requireJs.readAll() );
+    requireJs.close();
+
+    // Configure RequireJS
+    QString baseUrl( "requirejs.config({ baseUrl: 'file://" );
+    baseUrl += scriptFileInfo.absoluteDir().absolutePath();
+    baseUrl += "'});'";
+    m_engine->mainFrame()->evaluateJavaScript( baseUrl );
 
     // add resolver
     m_engine->setScriptPath( filePath() );
