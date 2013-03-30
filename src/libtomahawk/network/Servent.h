@@ -151,6 +151,7 @@ protected:
 
 public slots:
     void setInternalAddress();
+    void setExternalIPv6Address( QHostAddress ha, unsigned int port );
     void setExternalAddress( QHostAddress ha, unsigned int port );
 
     void socketError( QAbstractSocket::SocketError );
@@ -169,6 +170,7 @@ private slots:
 
 private:
     bool isValidExternalIP( const QHostAddress& addr ) const;
+    bool isValidExternalIPv6( const QHostAddress& addr ) const;
     void handoverSocket( Connection* conn, QTcpSocketExtra* sock );
     void printCurrentTransfers();
 
@@ -177,8 +179,9 @@ private:
     QMap< QString, QPointer< Connection > > m_offers;
     QStringList m_connectedNodes;
 
-    int m_port, m_externalPort;
+    int m_port, m_externalPort, m_externalIPv6Port;
     QHostAddress m_externalAddress;
+    QHostAddress m_externalIPv6Address;
     QString m_externalHostname;
     bool m_ready;
     bool m_lanHack;

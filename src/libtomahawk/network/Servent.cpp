@@ -162,8 +162,15 @@ Servent::startListening( QHostAddress ha, bool upnp, int port )
 
             // Check if we have a public/internet IP on this machine directly
             foreach ( QHostAddress ha, QNetworkInterface::allAddresses() ) {
-                if ( ha.protocol() == QAbstractSocket::IPv6Protocol )
-                    continue;
+                if ( isValidExternalIPv6( ha ) )
+                {
+                    tLog( LOGVERBOSE ) << Q_FUNC_INFO << QString( "Found public IPv6 address: %1" ).arg( ha.toString() );
+                    setExternalIPv6Address( ha, m_port );
+                    break;
+                }
+            }
+            // Check if we have a public/internet IP on this machine directly
+            foreach ( QHostAddress ha, QNetworkInterface::allAddresses() ) {
                 if ( isValidExternalIP( ha ) )
                 {
                     tLog( LOGVERBOSE ) << Q_FUNC_INFO << QString( "Found public IPv4 address: %1" ).arg( ha.toString() );
@@ -228,6 +235,18 @@ Servent::isValidExternalIP( const QHostAddress& addr ) const
     return !addr.isNull();
 }
 
+bool
+Servent::isValidExternalIPv6( const QHostAddress& addr ) const
+{
+    QString ip = addr.toString().toLower();
+    if (addr.protocol() != QAbstractSocket::IPv6Protocol)
+        return false;
+    if ( !m_lanHack && ( ip.startsWith( "::" ) || ip.startsWith( "ff" ) || ip.startsWith( "fe" ) || ip.startsWith( "fc" ) ) )
+        return false;
+
+    return !addr.isNull();
+}
+
 
 void
 Servent::setInternalAddress()
@@ -277,6 +296,18 @@ Servent::setExternalAddress( QHostAddress ha, unsigned int port )
     tLog() << "UPnP setup successful";
     m_ready = true;
     emit ready();
+}
+
+void
+Servent::setExternalIPv6Address( QHostAddress ha, unsigned int port )
+{
+    if ( isValidExternalIPv6( ha ) )
+    {
+        m_externalIPv6Address = ha;
+        m_externalIPv6Port = port;
+    }
+
+    tLog( LOGVERBOSE ) << Q_FUNC_INFO << QString( "Successfully set external IPv6 Address %1" ).arg( ha.toString() );
 }
 
 
