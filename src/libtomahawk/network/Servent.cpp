@@ -207,9 +207,22 @@ bool
 Servent::isValidExternalIP( const QHostAddress& addr ) const
 {
     QString ip = addr.toString();
-    if ( !m_lanHack && ( ip.startsWith( "10." ) || ip.startsWith( "172.16." ) || ip.startsWith( "192.168." ) ) )
-    {
+    if (addr.protocol() != QAbstractSocket::IPv4Protocol)
         return false;
+    if ( !m_lanHack )
+    {
+        if ( addr.isInSubnet(QHostAddress::parseSubnet("10.0.0.0/8")) )
+            return false;
+        if ( addr.isInSubnet(QHostAddress::parseSubnet("127.0.0.0/8")) )
+            return false;
+        if ( addr.isInSubnet(QHostAddress::parseSubnet("169.254.0.0/16")) )
+            return false;
+        if ( addr.isInSubnet(QHostAddress::parseSubnet("172.16.0.0/12")) )
+            return false;
+        if ( addr.isInSubnet(QHostAddress::parseSubnet("192.168.0.0/16")) )
+            return false;
+        if ( addr.isInSubnet(QHostAddress::parseSubnet("224.0.0.0/4")) )
+            return false;
     }
 
     return !addr.isNull();
