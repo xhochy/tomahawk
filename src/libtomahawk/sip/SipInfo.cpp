@@ -1,5 +1,6 @@
 /* === This file is part of Tomahawk Player - <http://tomahawk-player.org> ===
  *
+ *   Copyright 2013, Uwe L. Korn <uwelk@xhochy.com>
  *   Copyright 2011, Dominik Schmidt <dev@dominik-schmidt.de>
  *   Copyright 2010-2011, Jeff Mitchell <jeff@tomahawk-player.org>
  *
@@ -31,37 +32,77 @@ class SipInfoPrivate : public QSharedData
 {
 public:
     SipInfoPrivate()
-        : port( -1 )
     {
     }
 
     SipInfoPrivate( const SipInfoPrivate& other ) : QSharedData( other ),
-        visible(other.visible),
-        host(other.host),
-        port(other.port),
         nodeId(other.nodeId),
         key(other.key)
     {
     }
     ~SipInfoPrivate() { }
 
+    QString nodeId;
+    QString key;
+
+    bool isValid( bool visible ) const
+    {
+        // visible and all data available
+        if ( visible && !nodeId.isNull() && !key.isNull() )
+            return true;
+        // invisible and no data available
+        if ( !visible && nodeId.isNull() && key.isNull() )
+            return true;
+        return false;
+    }
+};
+
+class SipInfoHostPrivate : public QSharedData
+{
+public:
+    SipInfoHostPrivate()
+        : port( -1 )
+    {
+    }
+
+    SipInfoHostPrivate( const SipInfoHostPrivate& other ) : QSharedData( other ),
+        visible(other.visible),
+        host(other.host),
+        port(other.port)
+    {
+    }
+    ~SipInfoHostPrivate() { }
+
     QVariant visible;
     QString host;
     int port;
-    QString nodeId;
-    QString key;
+
+    bool isValid() const
+    {
+        // visible and all data available
+        if ( visible.toBool() && !host.isEmpty() && ( port > 0 ) )
+            return true;
+        // invisible and no data available
+        if ( !visible.toBool() && host.isEmpty() && ( port < 0 ) )
+            return true;
+        return false;
+    }
 };
 
 
 SipInfo::SipInfo()
 {
     d = new SipInfoPrivate;
+    d4 = new SipInfoHostPrivate;
+    d6 = new SipInfoHostPrivate;
 }
 
 
 SipInfo::SipInfo(const SipInfo& other)
     : QObject()
     , d( other.d )
+    , d4( other.d4 )
+    , d6( other.d6 )
 {
 }
 
@@ -75,36 +116,35 @@ SipInfo&
 SipInfo::operator=( const SipInfo& other )
 {
     d = other.d;
+    d4 = other.d4;
+    d6 = other.d6;
     return *this;
+}
+
+void
+SipInfo::clearHostPrivate(QSharedDataPointer< SipInfoHostPrivate > p)
+{
+    p->visible.clear();
+    p->host = QString();
+    p->port = -1;
 }
 
 
 void
 SipInfo::clear()
 {
-    d->visible.clear();
-    d->host = QString();
-    d->port = -1;
     d->nodeId = QString();
     d->key = QString();
+    clearHostPrivate(d4);
+    clearHostPrivate(d6);
 }
 
 
 bool
 SipInfo::isValid() const
 {
-//    qDebug() << Q_FUNC_INFO << d->visible << d->host.hostName() << d->port << d->nodeId << d->key;
-    if( !d->visible.isNull() )
-    {
-        if(
-            // visible and all data available
-            (  d->visible.toBool() && !d->host.isEmpty() && ( d->port > 0 ) && !d->nodeId.isNull() && !d->key.isNull() )
-            // invisible and no data available
-         || ( !d->visible.toBool() &&  d->host.isEmpty() && ( d->port < 0 ) && d->nodeId.isNull() &&   d->key.isNull() )
-        )
-            return true;
-    }
-
+    if( !d4->visible.isNull() && d4->isValid() && !d6->visible.isNull() && d6->isValid() )
+        return d->isValid( d4->visible.toBool() || d6->visible.toBool() );
     return false;
 }
 
@@ -112,7 +152,13 @@ SipInfo::isValid() const
 void
 SipInfo::setVisible( bool visible )
 {
-    d->visible.setValue(visible);
+    d4->visible.setValue(visible);
+}
+
+void
+SipInfo::setVisible6(bool visible)
+{
+    d6->visible.setValue(visible);
 }
 
 
@@ -121,14 +167,22 @@ SipInfo::isVisible() const
 {
     Q_ASSERT( isValid() );
 
-    return d->visible.toBool();
+    return d4->visible.toBool();
+}
+
+bool
+SipInfo::isVisible6() const
+{
+    Q_ASSERT( isValid() );
+
+    return d6->visible.toBool();
 }
 
 
 void
 SipInfo::setHost( const QString& host )
 {
-    d->host = host;
+    d4->host = host;
 }
 
 
@@ -137,14 +191,29 @@ SipInfo::host() const
 {
     Q_ASSERT( isValid() );
 
-    return d->host;
+    return d4->host;
+}
+
+void
+SipInfo::setHost6( const QString& host )
+{
+    d6->host = host;
+}
+
+
+const QString
+SipInfo::host6() const
+{
+    Q_ASSERT( isValid() );
+
+    return d6->host;
 }
 
 
 void
 SipInfo::setPort( int port )
 {
-    d->port = port;
+    d4->port = port;
 }
 
 
@@ -153,7 +222,22 @@ SipInfo::port() const
 {
     Q_ASSERT( isValid() );
 
-    return d->port;
+    return d4->port;
+}
+
+void
+SipInfo::setPort6( int port )
+{
+    d6->port = port;
+}
+
+
+int
+SipInfo::port6() const
+{
+    Q_ASSERT( isValid() );
+
+    return d6->port;
 }
 
 
@@ -199,6 +283,15 @@ SipInfo::toJson() const
     {
         m["ip"] = host();
         m["port"] = port();
+    }
+    m["visible6"] = isVisible6();
+    if ( isVisible6() )
+    {
+        m["ip6"] = host6();
+        m["port6"] = port6();
+    }
+    if ( isVisible() || isVisible6() )
+    {
         m["key"] = key();
         m["uniqname"] = nodeId();
     }
@@ -227,10 +320,20 @@ SipInfo::fromJson( QString json )
     QVariantMap m = v.toMap();
 
     info.setVisible( m["visible"].toBool() );
-    if( m["visible"].toBool() )
+    // by default visible6 is false and does not need to be part of the JSON for backward compability
+    if ( m.contains( "visible6" ) && m["visible6"].toBool() ) {
+        info.setHost6( m["host6"].toString() );
+        info.setPort6( m["port6"].toInt() );
+    }
+    else
+        info.setVisible6( false );
+    if ( m["visible"].toBool() )
     {
         info.setHost( m["host"].toString() );
         info.setPort( m["port"].toInt() );
+    }
+    if( m["visible"].toBool() || ( m.contains( "visible6" ) && m["visible6"].toBool() ) )
+    {
         info.setNodeId( m["uniqname"].toString() );
         info.setKey( m["key"].toString() );
     }
@@ -262,6 +365,9 @@ bool operator==( const SipInfo& one, const SipInfo& two )
         if ( one.isVisible() == two.isVisible()
             && one.host() == two.host()
             && one.port() == two.port()
+            && one.isVisible6() == two.isVisible6()
+            && one.host6() == two.host6()
+            && one.port6() == two.port6()
             && one.nodeId() == two.nodeId()
             && one.key() == two.key() )
         {
@@ -275,12 +381,15 @@ bool operator==( const SipInfo& one, const SipInfo& two )
 const QString
 SipInfo::debugString() const
 {
-    QString debugString( "SIP INFO: visible: %1 host: host %2 port: %3 nodeid: %4 key: %5" );
-    return debugString.arg( d->visible.toBool() )
-                      .arg( d->host )
-                      .arg( d->port )
+    QString debugString( "SIP INFO: visible: %1 host: host %2 port: %3 nodeid: %4 key: %5 visible6: %7 host6: %8 port6: %9" );
+    return debugString.arg( d4->visible.toBool() )
+                      .arg( d4->host )
+                      .arg( d4->port )
                       .arg( d->nodeId )
-                      .arg( d->key );
+                      .arg( d->key )
+                      .arg( d6->visible.toBool() )
+                      .arg( d6->host )
+                      .arg( d6->port );
 
 }
 

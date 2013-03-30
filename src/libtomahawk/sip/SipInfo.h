@@ -1,5 +1,6 @@
 /* === This file is part of Tomahawk Player - <http://tomahawk-player.org> ===
  *
+ *   Copyright 2013, Uwe L. Korn <uwelk@xhochy.com>
  *   Copyright 2011, Dominik Schmidt <dev@dominik-schmidt.de>
  *
  *   Tomahawk is free software: you can redistribute it and/or modify
@@ -25,6 +26,7 @@
 #include "DllMacro.h"
 
 class SipInfoPrivate;
+class SipInfoHostPrivate;
 
 class DLLEXPORT SipInfo : public QObject
 {
@@ -41,12 +43,18 @@ public:
 
     void setVisible( bool visible );
     bool isVisible() const;
+    void setVisible6( bool visible );
+    bool isVisible6() const;
 
     void setHost( const QString& host );
     const QString host() const;
+    void setHost6( const QString& host );
+    const QString host6() const;
 
     void setPort( int port );
     int port() const;
+    void setPort6( int port );
+    int port6() const;
 
     void setNodeId( const QString& nodeId );
     const QString nodeId() const;
@@ -62,6 +70,9 @@ public:
 
 private:
     QSharedDataPointer<SipInfoPrivate> d;
+    QSharedDataPointer<SipInfoHostPrivate> d4;
+    QSharedDataPointer<SipInfoHostPrivate> d6;
+    static void clearHostPrivate(QSharedDataPointer<SipInfoHostPrivate> p);
 };
 
 DLLEXPORT QDebug operator<<( QDebug dbg, const SipInfo &info );
