@@ -3,6 +3,7 @@
  *   Copyright 2010-2011, Christian Muehlhaeuser <muesli@tomahawk-player.org>
  *   Copyright 2010-2012, Jeff Mitchell <jeff@tomahawk-player.org>
  *   Copyright 2013,      Teo Mrnjavac <teo@kde.org>
+ *   Copyright 2013,      Uwe L. Korn <uwelk@xhochy.com>
  *
  *   Tomahawk is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -374,7 +375,7 @@ Servent::registerPeer( const Tomahawk::peerinfo_ptr& peerInfo )
         peerInfoDebug(peerInfo) << "YAY, we need to establish the connection now.. thinking";
         if ( !connectedToSession( peerInfo->sipInfo().nodeId() ) )
         {
-            connectToPeer( peerInfo );
+            connectToPeer( peerInfo, false );
         }
         else
         {
@@ -396,7 +397,7 @@ Servent::registerPeer( const Tomahawk::peerinfo_ptr& peerInfo )
     else
     {
         SipInfo info;
-        if ( visibleExternally() )
+        if ( visibleExternallyAny() )
         {
             QString peerId = peerInfo->id();
             QString key = uuid();
@@ -408,11 +409,29 @@ Servent::registerPeer( const Tomahawk::peerinfo_ptr& peerInfo )
             conn->addPeerInfo( peerInfo );
 
             registerOffer( key, conn );
-            info.setVisible( true );
-            info.setHost( externalAddress() );
-            info.setPort( externalPort() );
             info.setKey( key );
             info.setNodeId( nodeid );
+
+            if ( visibleExternally() )
+            {
+                // IPv4 connection information
+                info.setVisible( true );
+                info.setHost( externalAddress() );
+                info.setPort( externalPort() );
+            }
+            else
+                info.setVisible( false );
+
+            if ( visibleExternallyIPv6() )
+            {
+                // IPv4 connection information
+                info.setVisible6( true );
+                info.setHost6( externalIPv6Address() );
+                info.setPort6( externalIPv6Port() );
+            }
+            else
+                info.setVisible( false );
+            
 
             tDebug() << "Asking them (" << peerInfo->id() << ") to connect to us:" << info;
         }
@@ -453,6 +472,7 @@ void Servent::handleSipInfo( const Tomahawk::peerinfo_ptr& peerInfo )
     /*
         If only one party is externally visible, connection is obvious
         If both are, peer with lowest IP address initiates the connection.
+        First try IPv4, then IPv6.
 
         This avoids dupe connections.
     */
@@ -463,8 +483,22 @@ void Servent::handleSipInfo( const Tomahawk::peerinfo_ptr& peerInfo )
              ( externalAddress() == info.host() && externalPort() < info.port() ) )
         {
 
-            tDebug() << "Initiate connection to" << peerInfo->id() << "at" << info.host() << "peer of:" << peerInfo->sipPlugin()->account()->accountFriendlyName();
+            tDebug() << Q_FUNC_INFO << "Initiate connection to" << peerInfo->id() << "at" << info.host() << "peer of:" << peerInfo->sipPlugin()->account()->accountFriendlyName();
             connectToPeer( peerInfo );
+        }
+        else
+        {
+            tDebug() << Q_FUNC_INFO << "They should be conecting to us...";
+        }
+    }
+    else if ( info.isVisible6() )
+    {
+        if ( !visibleExternallyIPv6() || externalIPv6Address() < info.host6() ||
+             ( externalIPv6Address() == info.host6() && externalIPv6Port() < info.port6() ) )
+        {
+
+            tDebug() << Q_FUNC_INFO << "Initiate connection to" << peerInfo->id() << "at" << info.host6() << "peer of:" << peerInfo->sipPlugin()->account()->accountFriendlyName();
+            connectToPeer( peerInfo, true );
         }
         else
         {
@@ -767,7 +801,7 @@ Servent::socketError( QAbstractSocket::SocketError e )
 
 
 void
-Servent::connectToPeer( const peerinfo_ptr& peerInfo )
+Servent::connectToPeer( const peerinfo_ptr& peerInfo, bool useIPv6 )
 {
     Q_ASSERT( this->thread() == QThread::currentThread() );
 
@@ -842,25 +876,29 @@ Servent::connectToPeer( const peerinfo_ptr& peerInfo )
     conn->setProperty( "nodeid", sipInfo.nodeId() );
 
     registerControlConnection( conn );
-    connectToPeer( sipInfo.host(), sipInfo.port(), sipInfo.key(), conn );
+    if (useIPv6)
+        connectToPeer( sipInfo.host6(), sipInfo.port6(), sipInfo.key(), conn );
+    else
+        connectToPeer( sipInfo.host(), sipInfo.port(), sipInfo.key(), conn );
 }
 
 
 void
 Servent::connectToPeer( const QString& ha, int port, const QString &key, Connection* conn )
 {
-    tDebug( LOGVERBOSE ) << "Servent::connectToPeer:" << ha << ":" << port
+    tDebug( LOGVERBOSE ) << Q_FUNC_INFO << ha << ":" << port
                          << thread() << QThread::currentThread();
 
     Q_ASSERT( port > 0 );
     Q_ASSERT( conn );
 
-    if ( ( ha == m_externalAddress.toString() || ha == m_externalHostname ) &&
-         ( port == m_externalPort ) )
+    if ( ( ( ha == m_externalAddress.toString() || ha == m_externalHostname ) && ( port == m_externalPort ) )
+        || ( ( ha == m_externalIPv6Address.toString() ) && ( port == m_externalIPv6Port ) ) )
     {
-        tDebug() << "ERROR: Tomahawk won't try to connect to" << ha << ":" << port << ": identified as ourselves.";
+        tDebug() << Q_FUNC_INFO << "ERROR: Tomahawk won't try to connect to" << ha << ":" << port << ": identified as ourselves.";
         return;
     }
+    
 
     if ( key.length() && conn->firstMessage().isNull() )
     {

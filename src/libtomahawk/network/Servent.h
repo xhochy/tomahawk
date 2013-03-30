@@ -3,6 +3,7 @@
  *   Copyright 2010-2011, Christian Muehlhaeuser <muesli@tomahawk-player.org>
  *   Copyright 2010-2012, Jeff Mitchell <jeff@tomahawk-player.org>
  *   Copyright 2013,      Teo Mrnjavac <teo@kde.org>
+ *   Copyright 2013,      Uwe L. Korn <uwelk@xhochy.com>
  *
  *   Tomahawk is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -117,13 +118,17 @@ public slots:
     void onSipInfoChanged();
 
 public:
-    void connectToPeer( const Tomahawk::peerinfo_ptr& ha );
+    void connectToPeer( const Tomahawk::peerinfo_ptr& ha, bool useIPv6 = false );
     void connectToPeer( const QString& ha, int port, const QString &key, Connection* conn );
     void reverseOfferRequest( ControlConnection* orig_conn, const QString &theirdbid, const QString& key, const QString& theirkey );
 
     bool visibleExternally() const { return !m_externalHostname.isNull() || (m_externalPort > 0 && !m_externalAddress.isNull()); }
+    bool visibleExternallyIPv6() const { return (m_externalIPv6Port > 0 && !m_externalIPv6Address.isNull()); }
+    bool visibleExternallyAny() const { return (visibleExternally() || visibleExternallyIPv6()); }
     QString externalAddress() const { return !m_externalHostname.isNull() ? m_externalHostname : m_externalAddress.toString(); }
     int externalPort() const { return m_externalPort; }
+    QString externalIPv6Address() const { return m_externalIPv6Address.toString(); }
+    int externalIPv6Port() const { return m_externalIPv6Port; }
 
     static bool isIPWhitelisted( QHostAddress ip );
 
