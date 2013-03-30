@@ -136,7 +136,7 @@ Servent::startListening( QHostAddress ha, bool upnp, int port )
 
     TomahawkSettings::ExternalAddressMode mode = TomahawkSettings::instance()->externalAddressMode();
     
-    tLog() << "Servent listening on port" << m_port << "- servent thread:" << thread()
+    tLog( LOGVERBOSE ) << Q_FUNC_INFO << "Servent listening on port" << m_port << "- servent thread:" << thread()
            << "- address mode:" << (int)( mode );
 
     // --lanhack means to advertise your LAN IP as if it were externally visible
@@ -159,8 +159,20 @@ Servent::startListening( QHostAddress ha, bool upnp, int port )
                 setInternalAddress();
                 break;
             }
-            // TODO check if we have a public/internet IP on this machine directly
-            tLog() << "External address mode set to upnp...";
+
+            // Check if we have a public/internet IP on this machine directly
+            foreach ( QHostAddress ha, QNetworkInterface::allAddresses() ) {
+                if ( ha.protocol() == QAbstractSocket::IPv6Protocol )
+                    continue;
+                if ( isValidExternalIP( ha ) )
+                {
+                    tLog( LOGVERBOSE ) << Q_FUNC_INFO << QString( "Found public IPv4 address: %1" ).arg( ha.toString() );
+                    setExternalAddress( ha, m_port );
+                    break;
+                }
+            }
+
+            tLog() << Q_FUNC_INFO << "External address mode set to upnp...";
             m_portfwd = QPointer< PortFwdThread >( new PortFwdThread( m_port ) );
             Q_ASSERT( m_portfwd );
             connect( m_portfwd.data(), SIGNAL( externalAddressDetected( QHostAddress, unsigned int ) ),
@@ -209,10 +221,14 @@ Servent::setInternalAddress()
 {
     foreach ( QHostAddress ha, QNetworkInterface::allAddresses() )
     {
+        tDebug( LOGVERBOSE ) << Q_FUNC_INFO << QString( "Possible external address: %1" ).arg( ha.toString() );
+
+        // IPv4 localhost
         if ( ha.toString() == "127.0.0.1" )
             continue;
-        if ( ha.toString().contains( ":" ) )
-            continue; //ipv6
+        // Local IPv6 address
+        if ( ha.toString().startsWith( "::" ) )
+            continue;
 
         if ( m_lanHack && isValidExternalIP( ha ) )
         {
