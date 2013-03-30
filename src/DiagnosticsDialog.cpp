@@ -175,6 +175,19 @@ DiagnosticsDialog::accountLog( Tomahawk::Accounts::Account* account )
                     // .arg( connected ? "connected" : "not connected")
             );
         }
+        else if ( sipInfo.isVisible() && sipInfo.isVisible6() )
+        {
+            accountInfo.append(
+                QString("       %1: %2:%3 [%4]:%5 %6" /*" (%5)"*/)
+                    .arg( peerId )
+                    .arg( sipInfo.host() )
+                    .arg( sipInfo.port() )
+                    .arg( sipInfo.host6() )
+                    .arg( sipInfo.port6() )
+                    .arg( versionString )
+                    // .arg( connected ? "connected" : "not connected")
+            );
+        }
         else if ( sipInfo.isVisible() )
         {
             accountInfo.append(
@@ -182,6 +195,17 @@ DiagnosticsDialog::accountLog( Tomahawk::Accounts::Account* account )
                     .arg( peerId )
                     .arg( sipInfo.host() )
                     .arg( sipInfo.port() )
+                    .arg( versionString )
+                    // .arg( connected ? "connected" : "not connected")
+            );
+        }
+        else if ( sipInfo.isVisible6() )
+        {
+            accountInfo.append(
+                QString("       %1: [%2]:%3 %4" /*" (%5)"*/)
+                    .arg( peerId )
+                    .arg( sipInfo.host6() )
+                    .arg( sipInfo.port6() )
                     .arg( versionString )
                     // .arg( connected ? "connected" : "not connected")
             );
@@ -198,6 +222,7 @@ DiagnosticsDialog::accountLog( Tomahawk::Accounts::Account* account )
 
         if( sipInfo.isValid() )
         {
+            // TODO: Add IPv6 support here
             if( !Servent::instance()->visibleExternally() ||
                 Servent::instance()->externalAddress() < sipInfo.host() ||
             ( Servent::instance()->externalAddress() == sipInfo.host() && Servent::instance()->externalPort() < sipInfo.port() ) )
