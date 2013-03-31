@@ -2,6 +2,7 @@
  *
  *   Copyright 2011, Dominik Schmidt <dev@dominik-schmidt.de>
  *   Copyright 2011, Jeff Mitchell <jeff@tomahawk-player.org>
+ *   Copyright 2013, Uwe L. Korn <uwelk@xhochy.com>
  *
  *   Tomahawk is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -64,7 +65,7 @@ DiagnosticsDialog::updateLogView()
     log.append( QString( "TOMAHAWK DIAGNOSTICS LOG -%1 \n\n" ).arg( QDateTime::currentDateTime().toString() ) );
     log.append( "TOMAHAWK-VERSION: " TOMAHAWK_VERSION "\n" );
     log.append( "PLATFORM: " TOMAHAWK_SYSTEM "\n\n");
-    log.append( "NETWORK:\n    General:\n" );
+    log.append( "NETWORK:\n    IPv4:\n" );
 
     if ( Servent::instance()->visibleExternally() )
     {
@@ -76,6 +77,25 @@ DiagnosticsDialog::updateLogView()
                 "\n"
             ).arg( Servent::instance()->externalAddress() )
              .arg( Servent::instance()->externalPort() )
+
+        );
+    }
+    else
+    {
+        log.append( "      visible: false\n" );
+    }
+    
+    log.append( "    IPv6:\n" );
+    if ( Servent::instance()->visibleExternallyIPv6() )
+    {
+        log.append(
+            QString(
+                "      visible: true\n"
+                "      host: %1\n"
+                "      port: %2\n"
+                "\n"
+            ).arg( Servent::instance()->externalIPv6Address() )
+             .arg( Servent::instance()->externalIPv6Port() )
 
         );
     }
